@@ -23,8 +23,9 @@ enum Filtre {
 }
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key, this.onOpenProfile});
+  const TasksScreen({super.key, this.etendu = false, this.onOpenProfile});
 
+  final bool etendu;
   final VoidCallback? onOpenProfile;
 
   @override
@@ -36,7 +37,7 @@ class _TasksScreenState extends State<TasksScreen> {
   DateTime? _jour;
   String? _selection;
 
-  bool get _etendu => MediaQuery.sizeOf(context).width >= AppTokens.expanded;
+  bool get _etendu => widget.etendu;
 
   List<Task> _filtrer(List<Task> taches) {
     final jour = _jour;
@@ -87,120 +88,119 @@ class _TasksScreenState extends State<TasksScreen> {
     final groupes = _grouper(_filtrer(state.taches));
     final selection = _selection;
 
+    final lignes = <WidgetBuilder>[
+      (_) => const _Salutation(),
+      (_) => const Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppTokens.s4,
+          AppTokens.s2,
+          AppTokens.s4,
+          0,
+        ),
+        child: SummaryCard(),
+      ),
+      (_) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
+        child: ReminderBanner(onTap: _ouvrir),
+      ),
+      (_) => const SectionHeader(
+        'Mes 7 prochains jours',
+        padding: EdgeInsets.fromLTRB(
+          AppTokens.s5,
+          AppTokens.s5,
+          AppTokens.s5,
+          AppTokens.s2,
+        ),
+      ),
+      (_) => WeekStrip(
+        selected: _jour,
+        onSelected: (j) => setState(() => _jour = j),
+      ),
+      (_) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(
+          AppTokens.s4,
+          AppTokens.s4,
+          AppTokens.s4,
+          0,
+        ),
+        child: Row(
+          children: [
+            for (final f in Filtre.values)
+              Padding(
+                padding: const EdgeInsets.only(right: AppTokens.s2),
+                child: ChoiceChip(
+                  label: Text(f.label),
+                  selected: _filtre == f,
+                  showCheckmark: false,
+                  onSelected: (_) => setState(() => _filtre = f),
+                ),
+              ),
+          ],
+        ),
+      ),
+      if (groupes.isEmpty)
+        (_) => EmptyState(
+          icon: _filtre == Filtre.terminees
+              ? Icons.inventory_2_outlined
+              : Icons.celebration_outlined,
+          title: _filtre == Filtre.terminees
+              ? 'Aucune tâche terminée'
+              : 'Rien à rendre',
+          message: _filtre == Filtre.terminees
+              ? 'Vos tâches faites apparaîtront ici.'
+              : 'Profitez-en pour prendre de l’avance.',
+        ),
+      for (final (titre, taches) in groupes) ...[
+        (_) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
+          child: SectionHeader(
+            titre,
+            trailing: '${taches.length} tâche${taches.length > 1 ? 's' : ''}',
+          ),
+        ),
+        for (final task in taches)
+          (_) => Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTokens.s4,
+              0,
+              AppTokens.s4,
+              AppTokens.s2,
+            ),
+            child: TaskCard(
+              task: task,
+              selected: _etendu && task.id == selection,
+              onTap: () => _ouvrir(task),
+            ),
+          ),
+      ],
+    ];
+
     final liste = AsyncContent(
       child: RefreshIndicator(
         onRefresh: state.charger,
-        child: CustomScrollView(
+        child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            SliverSafeArea(
-              bottom: false,
-              sliver: SliverToBoxAdapter(
-                child: _Entete(onAvatar: widget.onOpenProfile),
-              ),
-            ),
-            const SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                AppTokens.s4,
-                AppTokens.s2,
-                AppTokens.s4,
-                0,
-              ),
-              sliver: SliverToBoxAdapter(child: SummaryCard()),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
-              sliver: SliverToBoxAdapter(child: ReminderBanner(onTap: _ouvrir)),
-            ),
-            const SliverToBoxAdapter(
-              child: SectionHeader(
-                'Mes 7 prochains jours',
-                padding: EdgeInsets.fromLTRB(
-                  AppTokens.s5,
-                  AppTokens.s5,
-                  AppTokens.s5,
-                  AppTokens.s2,
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: WeekStrip(
-                selected: _jour,
-                onSelected: (j) => setState(() => _jour = j),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.fromLTRB(
-                  AppTokens.s4,
-                  AppTokens.s4,
-                  AppTokens.s4,
-                  0,
-                ),
-                child: Row(
-                  children: [
-                    for (final f in Filtre.values)
-                      Padding(
-                        padding: const EdgeInsets.only(right: AppTokens.s2),
-                        child: ChoiceChip(
-                          label: Text(f.label),
-                          selected: _filtre == f,
-                          showCheckmark: false,
-                          onSelected: (_) => setState(() => _filtre = f),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            if (groupes.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: EmptyState(
-                  icon: _filtre == Filtre.terminees
-                      ? Icons.inventory_2_outlined
-                      : Icons.celebration_outlined,
-                  title: _filtre == Filtre.terminees
-                      ? 'Aucune tâche terminée'
-                      : 'Rien à rendre',
-                  message: _filtre == Filtre.terminees
-                      ? 'Vos tâches faites apparaîtront ici.'
-                      : 'Profitez-en pour prendre de l’avance.',
-                ),
-              ),
-            for (final (titre, taches) in groupes) ...[
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
-                sliver: SliverToBoxAdapter(
-                  child: SectionHeader(
-                    titre,
-                    trailing:
-                        '${taches.length} tâche${taches.length > 1 ? 's' : ''}',
-                  ),
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppTokens.s4),
-                sliver: SliverList.separated(
-                  itemCount: taches.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: AppTokens.s2),
-                  itemBuilder: (_, i) => TaskCard(
-                    task: taches[i],
-                    selected: _etendu && taches[i].id == selection,
-                    onTap: () => _ouvrir(taches[i]),
-                  ),
-                ),
-              ),
-            ],
-            const SliverToBoxAdapter(child: SizedBox(height: 112)),
-          ],
+          padding: const EdgeInsets.only(bottom: 112),
+          itemCount: lignes.length,
+          itemBuilder: (context, i) => lignes[i](context),
         ),
       ),
     );
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Échéances'),
+        actions: [
+          IconButton(
+            tooltip: 'Actualiser',
+            onPressed: state.chargement ? null : state.charger,
+            icon: const Icon(Icons.refresh_rounded),
+          ),
+          _BoutonProfil(onTap: widget.onOpenProfile),
+          const SizedBox(width: AppTokens.s2),
+        ],
+      ),
       floatingActionButtonLocation: _etendu
           ? FloatingActionButtonLocation.startFloat
           : FloatingActionButtonLocation.endFloat,
@@ -236,49 +236,47 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 }
 
-class _Entete extends StatelessWidget {
-  const _Entete({this.onAvatar});
-
-  final VoidCallback? onAvatar;
+class _Salutation extends StatelessWidget {
+  const _Salutation();
 
   @override
   Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final nom = state.utilisateur?.nom ?? '';
+    final nom = CampusScope.of(context).utilisateur?.nom ?? '';
     return PageTitle(
       subtitle: Dates.jourComplet(DateTime.now()),
       title: 'Bonjour $nom 👋',
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            tooltip: 'Actualiser',
-            onPressed: state.chargement ? null : state.charger,
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-          Semantics(
-            button: true,
-            label: 'Ouvrir le profil',
-            excludeSemantics: true,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: onAvatar,
-              child: Padding(
-                padding: const EdgeInsets.all(AppTokens.s1),
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: scheme.primary,
-                  foregroundColor: scheme.onPrimary,
-                  child: Text(
-                    nom.isEmpty ? '?' : nom.characters.first,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
+    );
+  }
+}
+
+class _BoutonProfil extends StatelessWidget {
+  const _BoutonProfil({this.onTap});
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final nom = CampusScope.of(context).utilisateur?.nom ?? '';
+    return Semantics(
+      button: true,
+      label: 'Ouvrir le profil',
+      excludeSemantics: true,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppTokens.s1),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: scheme.primary,
+            foregroundColor: scheme.onPrimary,
+            child: Text(
+              nom.isEmpty ? '?' : nom.characters.first,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

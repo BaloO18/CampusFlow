@@ -26,6 +26,14 @@ void main() {
     expect(find.byType(NavigationBar), findsOneWidget);
   });
 
+  testWidgets('échéances : AppBar, ListView et ListTile', (tester) async {
+    await seConnecter(tester);
+    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(ListView), findsOneWidget);
+    expect(find.byType(ListTile), findsWidgets);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+  });
+
   testWidgets('ajouter une tâche en 3 appuis', (tester) async {
     await seConnecter(tester);
     await tester.tap(find.text('Nouvelle tâche'));
@@ -34,6 +42,16 @@ void main() {
     await tester.tap(find.text('Enregistrer'));
     await tester.pumpAndSettle();
     expect(find.text('QCM Flutter'), findsOneWidget);
+    expect(find.text('Tâche ajoutée'), findsOneWidget);
+  });
+
+  testWidgets('formulaire : le titre est obligatoire', (tester) async {
+    await seConnecter(tester);
+    await tester.tap(find.text('Nouvelle tâche'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Enregistrer'));
+    await tester.pumpAndSettle();
+    expect(find.text('Le titre est obligatoire'), findsOneWidget);
   });
 
   testWidgets('détail puis marquer comme fait', (tester) async {
@@ -53,5 +71,15 @@ void main() {
     await tester.tap(find.text('Rendu TP Dart'));
     await tester.pumpAndSettle();
     expect(find.text('Marquer comme fait'), findsOneWidget);
+  });
+
+  testWidgets('tablette : le détail passe à côté dès 840 dp', (tester) async {
+    await seConnecter(tester, taille: const Size(840, 860));
+    expect(find.text('Sélectionnez une échéance'), findsOneWidget);
+  });
+
+  testWidgets('sous 840 dp : une seule colonne', (tester) async {
+    await seConnecter(tester, taille: const Size(839, 860));
+    expect(find.text('Sélectionnez une échéance'), findsNothing);
   });
 }

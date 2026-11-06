@@ -137,9 +137,18 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       rappel: _rappel,
       sansRappel: _rappel == null,
     );
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final sauvee = await CampusScope.of(context).enregistrer(task);
-      if (mounted) Navigator.of(context).pop(sauvee.id);
+      if (!mounted) return;
+      Navigator.of(context).pop(sauvee.id);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(_edition ? 'Tâche modifiée' : 'Tâche ajoutée'),
+          ),
+        );
     } catch (e) {
       if (!mounted) return;
       setState(() => _envoi = false);

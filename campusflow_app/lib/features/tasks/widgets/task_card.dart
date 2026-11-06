@@ -90,95 +90,65 @@ class TaskCard extends StatelessWidget {
               )
             : null,
         clipBehavior: Clip.antiAlias,
-        child: Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: onTap,
-                child: Semantics(
-                  button: true,
-                  selected: selected,
-                  excludeSemantics: true,
-                  label:
-                      '${task.titre}, ${cours?.nom ?? ''}, échéance $quand'
-                      '${retard ? ', en retard' : ''}'
-                      '${task.terminee ? ', terminée' : ''}',
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppTokens.s4,
-                      AppTokens.s4,
-                      AppTokens.s1,
-                      AppTokens.s4,
-                    ),
-                    child: Row(
-                      children: [
-                        CourseAvatar(course: cours),
-                        const SizedBox(width: AppTokens.s3),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task.titre,
-                                style: text.titleMedium?.copyWith(
-                                  decoration: task.terminee
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: task.terminee
-                                      ? scheme.onSurfaceVariant
-                                      : null,
-                                ),
-                              ),
-                              const SizedBox(height: AppTokens.s1),
-                              Wrap(
-                                spacing: AppTokens.s2,
-                                runSpacing: AppTokens.s1,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  _Meta(
-                                    icon: Icons.schedule_rounded,
-                                    label: quand,
-                                    color: retard ? scheme.error : null,
-                                  ),
-                                  Text(
-                                    cours?.nom ?? 'Sans cours',
-                                    style: text.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  if (retard) _Badge('En retard', scheme.error),
-                                  if (task.rappel != null && !task.terminee)
-                                    Icon(
-                                      Icons.notifications_active_outlined,
-                                      size: 14,
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+        child: ListTile(
+          onTap: onTap,
+          selected: selected,
+          titleAlignment: ListTileTitleAlignment.center,
+          contentPadding: const EdgeInsets.fromLTRB(
+            AppTokens.s4,
+            AppTokens.s2,
+            AppTokens.s1,
+            AppTokens.s2,
+          ),
+          leading: CourseAvatar(course: cours),
+          title: Text(
+            task.titre,
+            style: text.titleMedium?.copyWith(
+              decoration: task.terminee ? TextDecoration.lineThrough : null,
+              color: task.terminee ? scheme.onSurfaceVariant : null,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: AppTokens.s1),
+            child: Wrap(
+              spacing: AppTokens.s2,
+              runSpacing: AppTokens.s1,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                _Meta(
+                  icon: Icons.schedule_rounded,
+                  label: quand,
+                  color: retard ? scheme.error : null,
+                ),
+                Text(
+                  cours?.nom ?? 'Sans cours',
+                  style: text.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
                   ),
                 ),
-              ),
+                if (retard) _Badge('En retard', scheme.error),
+                if (task.rappel != null && !task.terminee)
+                  Icon(
+                    Icons.notifications_active_outlined,
+                    size: 14,
+                    color: scheme.onSurfaceVariant,
+                  ),
+              ],
             ),
-            IconButton(
-              tooltip: task.terminee
-                  ? 'Marquer comme à faire'
-                  : 'Marquer comme fait',
-              onPressed: () => basculerTache(context, task),
-              icon: Icon(
-                task.terminee
-                    ? Icons.check_circle_rounded
-                    : Icons.radio_button_unchecked_rounded,
-                color: task.terminee ? scheme.primary : scheme.outline,
-                size: 28,
-              ),
+          ),
+          trailing: IconButton(
+            tooltip: task.terminee
+                ? 'Marquer comme à faire'
+                : 'Marquer comme fait',
+            onPressed: () => basculerTache(context, task),
+            icon: Icon(
+              task.terminee
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: task.terminee ? scheme.primary : scheme.outline,
+              size: 28,
             ),
-            const SizedBox(width: AppTokens.s1),
-          ],
+          ),
         ),
       ),
     );
