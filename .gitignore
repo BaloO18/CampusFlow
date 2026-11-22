@@ -9,3 +9,4 @@ campusflow_models/pubspec.lock
 .DS_Store
 *.log
 .github/modernize/
+node_modules/

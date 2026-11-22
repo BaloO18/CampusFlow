@@ -1,0 +1,79 @@
+{
+  "utilisateurs": [
+    {
+      "id": "u1",
+      "nom": "Amina",
+      "email": "amina@campus.bf",
+      "motDePasse": "1234",
+      "formation": "Master 1 Informatique",
+      "rappelsActives": true
+    },
+    {
+      "id": "u2",
+      "nom": "Steve",
+      "email": "steve@campus.bf",
+      "motDePasse": "1234",
+      "formation": "Master 1 MSI",
+      "rappelsActives": true
+    }
+  ],
+  "cours": [
+    { "id": "c1", "nom": "Mobile", "enseignant": "Programmation mobile", "couleur": 4293668883 },
+    { "id": "c2", "nom": "Dart", "enseignant": "Langage Dart", "couleur": 4279592384 },
+    { "id": "c3", "nom": "UX", "enseignant": "Conception UX/UI", "couleur": 4285143962 },
+    { "id": "c4", "nom": "Bases de données", "couleur": 4281236786 },
+    { "id": "c5", "nom": "Réseaux", "couleur": 4278223759 },
+    { "id": "c6", "nom": "Anglais", "couleur": 4287458816 }
+  ],
+  "taches": [
+    {
+      "id": "t1",
+      "titre": "Rendu TP Dart",
+      "coursId": "c2",
+      "echeance": "2026-11-23T23:59:00",
+      "description": "Modèles Task, Course, User avec copyWith et fromJson. Trois tests avec dart test.",
+      "rappelMinutes": 1440,
+      "terminee": false
+    },
+    {
+      "id": "t2",
+      "titre": "Projet Flutter",
+      "coursId": "c1",
+      "echeance": "2026-11-27T17:00:00",
+      "description": "Prototype CampusFlow : écrans Échéances, Détail et Nouvelle tâche.",
+      "rappelMinutes": 180,
+      "terminee": false
+    },
+    {
+      "id": "t3",
+      "titre": "Examen UX",
+      "coursId": "c3",
+      "echeance": "2026-11-30T08:00:00",
+      "description": "Persona, job story, parcours utilisateur, wireframes.",
+      "rappelMinutes": 1440,
+      "terminee": false
+    },
+    {
+      "id": "t4",
+      "titre": "Dossier de conception v1",
+      "coursId": "c1",
+      "echeance": "2026-12-02T12:00:00",
+      "terminee": false
+    },
+    {
+      "id": "t5",
+      "titre": "Lecture : null safety",
+      "coursId": "c2",
+      "echeance": "2026-11-20T18:00:00",
+      "terminee": true
+    },
+    {
+      "id": "t6",
+      "titre": "TP SQL jointures",
+      "coursId": "c4",
+      "echeance": "2026-11-25T10:00:00",
+      "rappelMinutes": 60,
+      "terminee": false
+    }
+  ]
+}
