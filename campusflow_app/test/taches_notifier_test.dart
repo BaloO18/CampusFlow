@@ -1,3 +1,4 @@
+import 'package:campusflow/features/tasks/filtres.dart';
 import 'package:campusflow/features/tasks/taches_notifier.dart';
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,6 +21,28 @@ void main() {
 
     taches.basculer(nouvelle.id);
     expect(container.read(tacheProvider(nouvelle.id))?.terminee, isTrue);
+  });
+
+  test('les trois filtres dérivés suivent l’état', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final taches = container.read(tachesProvider.notifier);
+    final faitesAvant = container.read(tachesFaitesProvider).length;
+    final retard = taches.ajouter(
+      Task(id: '', titre: 'Oubli', coursId: 'c1', echeance: DateTime(2020)),
+    );
+    expect(container.read(tachesEnRetardProvider), contains(retard));
+    expect(container.read(tachesAFaireProvider), contains(retard));
+
+    taches.basculer(retard.id);
+    expect(container.read(tachesEnRetardProvider), isEmpty);
+    expect(container.read(tachesFaitesProvider), hasLength(faitesAvant + 1));
+
+    container.read(filtreProvider.notifier).choisir(Filtre.faites);
+    expect(
+      container.read(tachesFiltreesProvider),
+      container.read(tachesFaitesProvider),
+    );
   });
 
   test('supprimer retire la tâche de tous les fournisseurs dérivés', () {

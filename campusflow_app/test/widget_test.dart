@@ -76,8 +76,8 @@ void main() {
     GoRouter.of(tester.element(find.text('Marquer comme à faire'))).pop();
     await tester.pumpAndSettle();
     expect(find.text('Rendu TP Dart'), findsNothing);
-    await tester.ensureVisible(find.text('Terminées'));
-    await tester.tap(find.text('Terminées'));
+    await tester.ensureVisible(find.textContaining('Faites'));
+    await tester.tap(find.textContaining('Faites'));
     await tester.pumpAndSettle();
     expect(find.text('Rendu TP Dart'), findsOneWidget);
   });

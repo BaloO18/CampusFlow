@@ -10,6 +10,7 @@ import '../../core/utils/dates.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/section_header.dart';
 import '../auth/auth_notifier.dart';
+import 'filtres.dart';
 import 'taches_notifier.dart';
 import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
@@ -17,15 +18,6 @@ import 'widgets/reminder_banner.dart';
 import 'widgets/summary_card.dart';
 import 'widgets/task_card.dart';
 import 'widgets/week_strip.dart';
-
-enum Filtre {
-  semaine('Cette semaine'),
-  aFaire('À faire'),
-  terminees('Terminées');
-
-  const Filtre(this.label);
-  final String label;
-}
 
 class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
@@ -35,27 +27,18 @@ class TasksScreen extends ConsumerStatefulWidget {
 }
 
 class _TasksScreenState extends ConsumerState<TasksScreen> {
-  Filtre _filtre = Filtre.semaine;
   DateTime? _jour;
   String? _selection;
 
   bool get _etendu => Disposition.etendueDe(context);
 
-  List<Task> _filtrer(List<Task> taches) {
+  List<Task> _duJour(List<Task> taches) {
     final jour = _jour;
-    Iterable<Task> liste = switch (_filtre) {
-      Filtre.semaine => taches.where(
-        (t) => !t.terminee && Dates.cetteSemaine(t.echeance),
-      ),
-      Filtre.aFaire => taches.where((t) => !t.terminee),
-      Filtre.terminees => taches.where((t) => t.terminee),
-    };
-    if (jour != null) {
-      liste = liste.where((t) => Dates.memeJour(t.echeance, jour));
-    }
-    final tri = liste.toList()
-      ..sort((a, b) => a.echeance.compareTo(b.echeance));
-    return _filtre == Filtre.terminees ? tri.reversed.toList() : tri;
+    if (jour == null) return taches;
+    return [
+      for (final t in taches)
+        if (Dates.memeJour(t.echeance, jour)) t,
+    ];
   }
 
   List<(String, List<Task>)> _grouper(List<Task> taches) {
@@ -82,8 +65,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final taches = ref.watch(tachesProvider);
-    final groupes = _grouper(_filtrer(taches));
+    final filtre = ref.watch(filtreProvider);
+    final groupes = _grouper(_duJour(ref.watch(tachesFiltreesProvider)));
     final selection = _selection;
 
     final lignes = <WidgetBuilder>[
@@ -128,10 +111,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: AppTokens.s2),
                 child: ChoiceChip(
-                  label: Text(f.label),
-                  selected: _filtre == f,
+                  label: Text(
+                    '${f.label} (${ref.watch(tachesDuFiltreProvider(f)).length})',
+                  ),
+                  selected: filtre == f,
                   showCheckmark: false,
-                  onSelected: (_) => setState(() => _filtre = f),
+                  onSelected: (_) =>
+                      ref.read(filtreProvider.notifier).choisir(f),
                 ),
               ),
           ],
@@ -139,13 +125,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       ),
       if (groupes.isEmpty)
         (_) => EmptyState(
-          icon: _filtre == Filtre.terminees
+          icon: filtre == Filtre.faites
               ? Icons.inventory_2_outlined
               : Icons.celebration_outlined,
-          title: _filtre == Filtre.terminees
+          title: filtre == Filtre.faites
               ? 'Aucune tâche terminée'
               : 'Rien à rendre',
-          message: _filtre == Filtre.terminees
+          message: filtre == Filtre.faites
               ? 'Vos tâches faites apparaîtront ici.'
               : 'Profitez-en pour prendre de l’avance.',
         ),
