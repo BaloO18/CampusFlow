@@ -1,6 +1,8 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/router.dart';
 import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../core/utils/dates.dart';
@@ -10,11 +12,13 @@ Future<String?> ouvrirFormulaire(
   BuildContext context, {
   Task? task,
   String? coursId,
-}) => Navigator.of(context).push<String>(
-  MaterialPageRoute(
-    fullscreenDialog: true,
-    builder: (_) => TaskFormScreen(task: task, coursId: coursId),
-  ),
+}) => context.push<String>(
+  task != null
+      ? Routes.modifier(task.id)
+      : Uri(
+          path: Routes.nouvelle,
+          queryParameters: {'cours': ?coursId},
+        ).toString(),
 );
 
 class TaskFormScreen extends StatefulWidget {

@@ -3,6 +3,8 @@ import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:campusflow/features/home/home_shell.dart';
 
 Future<void> seConnecter(
   WidgetTester tester, {
@@ -76,6 +78,30 @@ void main() {
     await tester.tap(find.text('Rendu TP Dart'));
     await tester.pumpAndSettle();
     expect(find.text('Marquer comme fait'), findsOneWidget);
+  });
+
+  testWidgets('la barre de navigation change d’adresse', (tester) async {
+    await seConnecter(tester);
+    await tester.tap(find.text('Cours'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mes cours'), findsOneWidget);
+    await tester.tap(find.text('Profil'));
+    await tester.pumpAndSettle();
+    expect(find.text('Déconnexion'), findsOneWidget);
+  });
+
+  testWidgets('chaque écran est accessible par son adresse', (tester) async {
+    await seConnecter(tester);
+    final router = GoRouter.of(tester.element(find.byType(HomeShell)));
+    router.go('/taches/t1');
+    await tester.pumpAndSettle();
+    expect(find.text('Marquer comme fait'), findsOneWidget);
+    router.go('/taches/nouvelle');
+    await tester.pumpAndSettle();
+    expect(find.text('Enregistrer'), findsOneWidget);
+    router.go('/cours/c1');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('à faire'), findsWidgets);
   });
 
   testWidgets('tablette : le détail passe à côté dès 840 dp', (tester) async {

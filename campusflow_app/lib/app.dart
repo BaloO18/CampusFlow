@@ -1,11 +1,11 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 
+import 'core/router.dart';
 import 'core/state/campus_state.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/login_screen.dart';
-import 'features/home/home_shell.dart';
 
 class CampusFlowApp extends StatefulWidget {
   const CampusFlowApp({super.key, this.repository});
@@ -20,9 +20,11 @@ class _CampusFlowAppState extends State<CampusFlowApp> {
   late final CampusState _state = CampusState(
     widget.repository ?? FakeCampusRepository(),
   );
+  late final GoRouter _router = creerRouter(_state);
 
   @override
   void dispose() {
+    _router.dispose();
     _state.dispose();
     super.dispose();
   }
@@ -33,7 +35,7 @@ class _CampusFlowAppState extends State<CampusFlowApp> {
       notifier: _state,
       child: ListenableBuilder(
         listenable: _state,
-        builder: (context, _) => MaterialApp(
+        builder: (context, _) => MaterialApp.router(
           title: 'CampusFlow',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.build(Brightness.light),
@@ -42,9 +44,7 @@ class _CampusFlowAppState extends State<CampusFlowApp> {
           locale: const Locale('fr'),
           supportedLocales: const [Locale('fr')],
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
-          home: _state.utilisateur == null
-              ? const LoginScreen()
-              : const HomeShell(),
+          routerConfig: _router,
         ),
       ),
     );

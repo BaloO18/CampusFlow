@@ -1,12 +1,13 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/router.dart';
 import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../shared/widgets/async_content.dart';
 import '../../shared/widgets/course_avatar.dart';
 import '../../shared/widgets/section_header.dart';
-import 'course_tasks_screen.dart';
 
 class CoursesScreen extends StatelessWidget {
   const CoursesScreen({super.key});
@@ -70,11 +71,7 @@ class _CarteCours extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => CourseTasksScreen(cours: cours),
-            ),
-          ),
+          onTap: () => context.push(Routes.coursDetail(cours.id)),
           child: Padding(
             padding: const EdgeInsets.all(AppTokens.s4),
             child: Column(

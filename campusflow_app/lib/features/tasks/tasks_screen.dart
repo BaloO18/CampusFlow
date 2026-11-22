@@ -1,6 +1,9 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/layout/disposition.dart';
+import '../../core/router.dart';
 import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../core/utils/dates.dart';
@@ -23,10 +26,7 @@ enum Filtre {
 }
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key, this.etendu = false, this.onOpenProfile});
-
-  final bool etendu;
-  final VoidCallback? onOpenProfile;
+  const TasksScreen({super.key});
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -37,7 +37,7 @@ class _TasksScreenState extends State<TasksScreen> {
   DateTime? _jour;
   String? _selection;
 
-  bool get _etendu => widget.etendu;
+  bool get _etendu => Disposition.etendueDe(context);
 
   List<Task> _filtrer(List<Task> taches) {
     final jour = _jour;
@@ -70,11 +70,7 @@ class _TasksScreenState extends State<TasksScreen> {
       setState(() => _selection = task.id);
       return;
     }
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => TaskDetailScreen(taskId: task.id),
-      ),
-    );
+    await context.push(Routes.tache(task.id));
   }
 
   Future<void> _nouvelle() async {
@@ -197,7 +193,7 @@ class _TasksScreenState extends State<TasksScreen> {
             onPressed: state.chargement ? null : state.charger,
             icon: const Icon(Icons.refresh_rounded),
           ),
-          _BoutonProfil(onTap: widget.onOpenProfile),
+          _BoutonProfil(onTap: () => context.go(Routes.profil)),
           const SizedBox(width: AppTokens.s2),
         ],
       ),

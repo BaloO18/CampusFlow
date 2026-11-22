@@ -1,21 +1,24 @@
-import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/router.dart';
 import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../shared/widgets/async_content.dart';
-import '../tasks/task_detail_screen.dart';
 import '../tasks/task_form_screen.dart';
 import '../tasks/widgets/task_card.dart';
 
 class CourseTasksScreen extends StatelessWidget {
-  const CourseTasksScreen({super.key, required this.cours});
+  const CourseTasksScreen({super.key, required this.coursId});
 
-  final Course cours;
+  final String coursId;
 
   @override
   Widget build(BuildContext context) {
-    final taches = CampusScope.of(context).tachesDuCours(cours.id);
+    final state = CampusScope.of(context);
+    final cours = state.coursDe(coursId);
+    if (cours == null) return Scaffold(appBar: AppBar());
+    final taches = state.tachesDuCours(cours.id);
     final aFaire = taches.where((t) => !t.terminee).length;
     final couleur = Color(cours.couleur);
     final text = Theme.of(context).textTheme;
@@ -89,11 +92,7 @@ class CourseTasksScreen extends StatelessWidget {
                     const SizedBox(height: AppTokens.s2),
                 itemBuilder: (context, i) => TaskCard(
                   task: taches[i],
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => TaskDetailScreen(taskId: taches[i].id),
-                    ),
-                  ),
+                  onTap: () => context.push(Routes.tache(taches[i].id)),
                 ),
               ),
             ),
