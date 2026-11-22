@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/auth/auth_notifier.dart';
-import '../features/auth/login_screen.dart';
-import '../features/courses/course_tasks_screen.dart';
-import '../features/courses/courses_screen.dart';
-import '../features/home/home_shell.dart';
-import '../features/profile/profile_screen.dart';
-import '../features/tasks/task_detail_screen.dart';
-import '../features/tasks/task_form_screen.dart';
-import '../features/tasks/tasks_screen.dart';
+import '../features/auth/application/auth_notifier.dart';
+import '../features/auth/presentation/login_screen.dart';
+import '../features/cours/presentation/course_tasks_screen.dart';
+import '../features/cours/presentation/courses_screen.dart';
+import '../features/home/presentation/home_shell.dart';
+import '../features/profil/presentation/profile_screen.dart';
+import '../features/taches/presentation/task_detail_screen.dart';
+import '../features/taches/presentation/task_form_screen.dart';
+import '../features/taches/presentation/tasks_screen.dart';
 
 abstract final class Routes {
   static const login = '/login';

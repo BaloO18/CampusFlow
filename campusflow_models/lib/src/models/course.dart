@@ -22,7 +22,7 @@ class Course {
   );
 
   factory Course.fromJson(JsonMap json) => Course(
-    id: champ<String>(json, 'id'),
+    id: identifiant(json, 'id'),
     nom: champ<String>(json, 'nom'),
     enseignant: champFacultatif<String>(json, 'enseignant'),
     couleur: champFacultatif<int>(json, 'couleur') ?? 0xFFEC3013,

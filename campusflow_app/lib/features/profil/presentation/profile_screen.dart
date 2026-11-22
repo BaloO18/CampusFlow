@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_tokens.dart';
-import '../../core/theme/mode_theme.dart';
-import '../../shared/widgets/section_header.dart';
-import '../auth/auth_notifier.dart';
-import '../tasks/taches_notifier.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../core/theme/mode_theme.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../../taches/application/taches_notifier.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});

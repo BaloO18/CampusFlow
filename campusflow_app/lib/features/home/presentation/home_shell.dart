@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/layout/disposition.dart';
-import '../../core/router.dart';
-import '../../core/theme/app_tokens.dart';
+import '../../../core/layout/disposition.dart';
+import '../../../core/router.dart';
+import '../../../core/theme/app_tokens.dart';
 
 class HomeShell extends StatelessWidget {
   const HomeShell({super.key, required this.location, required this.child});

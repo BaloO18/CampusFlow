@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_tokens.dart';
-import '../../../core/utils/dates.dart';
-import '../taches_notifier.dart';
+import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/utils/dates.dart';
+import '../../application/taches_notifier.dart';
 
 class SummaryCard extends ConsumerWidget {
   const SummaryCard({super.key});

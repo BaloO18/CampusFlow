@@ -12,6 +12,14 @@ T? champFacultatif<T>(JsonMap json, String cle) {
   throw FormatException('Champ « $cle » invalide : $valeur');
 }
 
+String identifiant(JsonMap json, String cle) => switch (json[cle]) {
+  final String id when id.isNotEmpty => id,
+  final int id => '$id',
+  final valeur => throw FormatException(
+    'Identifiant « $cle » manquant ou invalide : $valeur',
+  ),
+};
+
 DateTime date(JsonMap json, String cle) {
   final texte = champ<String>(json, cle);
   final d = DateTime.tryParse(texte);

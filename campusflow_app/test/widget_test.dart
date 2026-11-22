@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:campusflow/features/auth/auth_notifier.dart';
-import 'package:campusflow/features/home/home_shell.dart';
+import 'package:campusflow/features/auth/application/auth_notifier.dart';
+import 'package:campusflow/features/home/presentation/home_shell.dart';
 
 Future<void> seConnecter(
   WidgetTester tester, {

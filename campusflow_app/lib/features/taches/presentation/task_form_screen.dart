@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/router.dart';
-import '../../core/theme/app_tokens.dart';
-import '../../core/utils/dates.dart';
-import '../../shared/widgets/section_header.dart';
-import '../auth/auth_notifier.dart';
-import 'taches_notifier.dart';
+import '../../../core/router.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../core/utils/dates.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../auth/application/auth_notifier.dart';
+import '../application/taches_notifier.dart';
 
 Future<String?> ouvrirFormulaire(
   BuildContext context, {

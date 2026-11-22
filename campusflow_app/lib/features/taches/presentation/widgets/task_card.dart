@@ -2,10 +2,10 @@ import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_tokens.dart';
-import '../../../core/utils/dates.dart';
-import '../../../shared/widgets/course_avatar.dart';
-import '../taches_notifier.dart';
+import '../../../../core/theme/app_tokens.dart';
+import '../../../../core/utils/dates.dart';
+import '../../../../shared/widgets/course_avatar.dart';
+import '../../application/taches_notifier.dart';
 
 Future<void> basculerTache(
   BuildContext context,

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/router.dart';
-import '../../core/theme/app_tokens.dart';
-import '../../shared/widgets/course_avatar.dart';
-import '../../shared/widgets/section_header.dart';
-import '../tasks/taches_notifier.dart';
+import '../../../core/router.dart';
+import '../../../core/theme/app_tokens.dart';
+import '../../../shared/widgets/course_avatar.dart';
+import '../../../shared/widgets/section_header.dart';
+import '../../taches/application/taches_notifier.dart';
 
 class CoursesScreen extends ConsumerWidget {
   const CoursesScreen({super.key});

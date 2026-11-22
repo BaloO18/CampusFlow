@@ -30,7 +30,7 @@ class User {
   );
 
   factory User.fromJson(JsonMap json) => User(
-    id: champ<String>(json, 'id'),
+    id: identifiant(json, 'id'),
     nom: champ<String>(json, 'nom'),
     email: champ<String>(json, 'email'),
     formation: champFacultatif<String>(json, 'formation'),

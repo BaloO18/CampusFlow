@@ -54,7 +54,7 @@ class Task {
   factory Task.fromJson(JsonMap json) {
     final minutes = champFacultatif<int>(json, 'rappelMinutes');
     return Task(
-      id: champ<String>(json, 'id'),
+      id: identifiant(json, 'id'),
       titre: champ<String>(json, 'titre'),
       coursId: champ<String>(json, 'coursId'),
       echeance: date(json, 'echeance'),

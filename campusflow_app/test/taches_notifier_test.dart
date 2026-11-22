@@ -1,5 +1,5 @@
-import 'package:campusflow/features/tasks/filtres.dart';
-import 'package:campusflow/features/tasks/taches_notifier.dart';
+import 'package:campusflow/features/taches/application/filtres.dart';
+import 'package:campusflow/features/taches/application/taches_notifier.dart';
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
