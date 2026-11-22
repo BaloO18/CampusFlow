@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 Future<void> seConnecter(
   WidgetTester tester, {
-  Size taille = const Size(400, 860),
+  Size taille = const Size(400, 2000),
 }) async {
   tester.view.physicalSize = taille;
   tester.view.devicePixelRatio = 1;
@@ -65,7 +65,7 @@ void main() {
   });
 
   testWidgets('étendu : rail de navigation et liste + détail', (tester) async {
-    await seConnecter(tester, taille: const Size(1200, 860));
+    await seConnecter(tester, taille: const Size(1200, 2000));
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.text('Sélectionnez une échéance'), findsOneWidget);
     await tester.tap(find.text('Rendu TP Dart'));
@@ -74,12 +74,12 @@ void main() {
   });
 
   testWidgets('tablette : le détail passe à côté dès 840 dp', (tester) async {
-    await seConnecter(tester, taille: const Size(840, 860));
+    await seConnecter(tester, taille: const Size(840, 2000));
     expect(find.text('Sélectionnez une échéance'), findsOneWidget);
   });
 
   testWidgets('sous 840 dp : une seule colonne', (tester) async {
-    await seConnecter(tester, taille: const Size(839, 860));
+    await seConnecter(tester, taille: const Size(839, 2000));
     expect(find.text('Sélectionnez une échéance'), findsNothing);
   });
 }

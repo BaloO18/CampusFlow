@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
@@ -73,28 +74,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: Column(
                     children: [
-                      Semantics(
-                        label: 'Logo CampusFlow',
-                        image: true,
-                        child: Container(
-                          width: 88,
-                          height: 88,
-                          decoration: BoxDecoration(
-                            color: blanc,
-                            borderRadius: BorderRadius.circular(28),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.event_available_rounded,
-                            size: 48,
-                            color: scheme.primary,
-                          ),
+                      Container(
+                        width: 88,
+                        height: 88,
+                        padding: const EdgeInsets.all(AppTokens.s2),
+                        decoration: BoxDecoration(
+                          color: blanc,
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/images/logo.svg',
+                          semanticsLabel: 'Logo CampusFlow',
                         ),
                       ),
                       const SizedBox(height: AppTokens.s5),

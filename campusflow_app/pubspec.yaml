@@ -13,6 +13,7 @@ dependencies:
     sdk: flutter
   campusflow_models:
     path: ../campusflow_models
+  flutter_svg: ^2.5.0
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +22,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
