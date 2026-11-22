@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../application/cours_providers.dart';
 import '../../taches/application/taches_notifier.dart';
 import '../../taches/presentation/task_form_screen.dart';
 import '../../taches/presentation/widgets/task_card.dart';

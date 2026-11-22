@@ -8,6 +8,7 @@ import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/dates.dart';
 import '../../../shared/widgets/section_header.dart';
 import '../../auth/application/auth_notifier.dart';
+import '../../cours/application/cours_providers.dart';
 import '../application/taches_notifier.dart';
 
 Future<String?> ouvrirFormulaire(
@@ -145,8 +146,9 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
     final messenger = ScaffoldMessenger.of(context);
     try {
       final taches = ref.read(tachesProvider.notifier);
-      final sauvee = _edition ? task : taches.ajouter(task);
-      if (_edition) taches.modifier(task);
+      final sauvee = _edition
+          ? await taches.modifier(task)
+          : await taches.ajouter(task);
       if (!mounted) return;
       Navigator.of(context).pop(sauvee.id);
       messenger

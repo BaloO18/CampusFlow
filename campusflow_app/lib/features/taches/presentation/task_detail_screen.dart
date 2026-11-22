@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/dates.dart';
+import '../../cours/application/cours_providers.dart';
 import '../application/taches_notifier.dart';
 import 'task_form_screen.dart';
 import 'widgets/task_card.dart';
@@ -59,9 +60,14 @@ class TaskDetailView extends ConsumerWidget {
         ],
       ),
     );
-    if (ok ?? false) {
-      ref.read(tachesProvider.notifier).supprimer(taskId);
+    if (!(ok ?? false) || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(tachesProvider.notifier).supprimer(taskId);
       onDeleted?.call();
+      messenger.showSnackBar(const SnackBar(content: Text('Tâche supprimée')));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Échec : $e')));
     }
   }
 

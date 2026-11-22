@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/utils/dates.dart';
 import '../../../../shared/widgets/course_avatar.dart';
+import '../../../cours/application/cours_providers.dart';
 import '../../application/taches_notifier.dart';
 
 Future<void> basculerTache(
@@ -13,19 +14,22 @@ Future<void> basculerTache(
   Task task,
 ) async {
   final taches = ref.read(tachesProvider.notifier);
-  final messenger = ScaffoldMessenger.of(context);
-  taches.basculer(task.id);
-  messenger
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(
-        content: Text(task.terminee ? 'Tâche rouverte' : 'Tâche terminée 🎉'),
-        action: SnackBarAction(
-          label: 'Annuler',
-          onPressed: () => taches.basculer(task.id),
-        ),
+  final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
+  try {
+    await taches.basculer(task.id);
+  } catch (e) {
+    messenger.showSnackBar(SnackBar(content: Text('Échec : $e')));
+    return;
+  }
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(task.terminee ? 'Tâche rouverte' : 'Tâche terminée 🎉'),
+      action: SnackBarAction(
+        label: 'Annuler',
+        onPressed: () => taches.basculer(task.id).ignore(),
       ),
-    );
+    ),
+  );
 }
 
 class TaskCard extends ConsumerWidget {

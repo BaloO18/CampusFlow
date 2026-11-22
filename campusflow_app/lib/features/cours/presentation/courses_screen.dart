@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../shared/widgets/course_avatar.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/section_header.dart';
+import '../application/cours_providers.dart';
 import '../../taches/application/taches_notifier.dart';
 
 class CoursesScreen extends ConsumerWidget {
@@ -14,8 +16,30 @@ class CoursesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cours = ref.watch(coursProvider);
+    final etat = ref.watch(coursAsyncProvider);
+    final cours = etat.value ?? const <Course>[];
     final echelle = MediaQuery.textScalerOf(context).scale(16) / 16;
+    if (etat.hasError && cours.isEmpty) {
+      return Scaffold(
+        body: EmptyState(
+          icon: Icons.cloud_off_rounded,
+          title: 'Impossible de charger les cours',
+          message: '${etat.error}',
+          action: FilledButton.icon(
+            onPressed: () => ref.invalidate(coursAsyncProvider),
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Réessayer'),
+          ),
+        ),
+      );
+    }
+    if (etat.isLoading && cours.isEmpty) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(semanticsLabel: 'Chargement'),
+        ),
+      );
+    }
     return Scaffold(
       body: CustomScrollView(
         slivers: [

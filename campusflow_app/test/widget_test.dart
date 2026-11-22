@@ -1,26 +1,26 @@
 import 'package:campusflow/app.dart';
-import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:campusflow/features/auth/application/auth_notifier.dart';
+
+import 'package:campusflow/features/taches/data/fake_task_repository.dart';
+
+import 'support.dart';
 import 'package:campusflow/features/home/presentation/home_shell.dart';
 
 Future<void> seConnecter(
   WidgetTester tester, {
   Size taille = const Size(400, 2000),
+  FakeTaskRepository? taches,
 }) async {
   tester.view.physicalSize = taille;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        campusRepositoryProvider.overrideWithValue(
-          FakeCampusRepository(latence: Duration.zero),
-        ),
-      ],
+      retry: (_, _) => null,
+      overrides: surcharges(taches: taches),
       child: const CampusFlowApp(),
     ),
   );
@@ -99,6 +99,18 @@ void main() {
     await tester.tap(find.text('Rendu TP Dart'));
     await tester.pumpAndSettle();
     expect(find.text('Marquer comme fait'), findsOneWidget);
+  });
+
+  testWidgets('serveur coupé : message d’erreur puis Réessayer', (
+    tester,
+  ) async {
+    final repo = FakeTaskRepository(latence: Duration.zero, echouer: true);
+    await seConnecter(tester, taches: repo);
+    expect(find.text('Impossible de charger les échéances'), findsOneWidget);
+    repo.echouer = false;
+    await tester.tap(find.text('Réessayer'));
+    await tester.pumpAndSettle();
+    expect(find.text('Rendu TP Dart'), findsOneWidget);
   });
 
   testWidgets('la barre de navigation change d’adresse', (tester) async {

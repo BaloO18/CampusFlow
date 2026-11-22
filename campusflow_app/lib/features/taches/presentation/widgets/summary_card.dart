@@ -10,7 +10,7 @@ class SummaryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final taches = ref.watch(tachesProvider);
+    final taches = ref.watch(listeTachesProvider);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final semaine =

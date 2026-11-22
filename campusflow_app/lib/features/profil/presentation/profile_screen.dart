@@ -54,7 +54,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider);
-    final taches = ref.watch(tachesProvider);
+    final taches = ref.watch(listeTachesProvider);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final nom = user?.nom ?? '';

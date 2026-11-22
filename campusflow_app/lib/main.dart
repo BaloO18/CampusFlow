@@ -3,4 +3,5 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 
-void main() => runApp(const ProviderScope(child: CampusFlowApp()));
+void main() =>
+    runApp(ProviderScope(retry: (_, _) => null, child: const CampusFlowApp()));

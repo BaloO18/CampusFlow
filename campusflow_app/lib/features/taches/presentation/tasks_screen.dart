@@ -160,16 +160,42 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       ],
     ];
 
-    final liste = ListView.builder(
-      padding: const EdgeInsets.only(bottom: 112),
-      itemCount: lignes.length,
-      itemBuilder: (context, i) => lignes[i](context),
+    final etat = ref.watch(tachesProvider);
+    final taches = ref.read(tachesProvider.notifier);
+    final liste = etat.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(semanticsLabel: 'Chargement'),
+      ),
+      error: (erreur, _) => EmptyState(
+        icon: Icons.cloud_off_rounded,
+        title: 'Impossible de charger les échéances',
+        message: '$erreur',
+        action: FilledButton.icon(
+          onPressed: () => ref.invalidate(tachesProvider),
+          icon: const Icon(Icons.refresh_rounded),
+          label: const Text('Réessayer'),
+        ),
+      ),
+      data: (_) => RefreshIndicator(
+        onRefresh: taches.recharger,
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: 112),
+          itemCount: lignes.length,
+          itemBuilder: (context, i) => lignes[i](context),
+        ),
+      ),
     );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Échéances'),
         actions: [
+          IconButton(
+            tooltip: 'Actualiser',
+            onPressed: etat.isLoading ? null : taches.recharger,
+            icon: const Icon(Icons.refresh_rounded),
+          ),
           _BoutonProfil(onTap: () => context.go(Routes.profil)),
           const SizedBox(width: AppTokens.s2),
         ],

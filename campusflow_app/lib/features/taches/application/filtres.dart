@@ -27,16 +27,18 @@ List<Task> _parEcheance(Iterable<Task> taches) =>
     taches.toList()..sort((a, b) => a.echeance.compareTo(b.echeance));
 
 final tachesAFaireProvider = Provider<List<Task>>(
-  (ref) => _parEcheance(ref.watch(tachesProvider).where((t) => !t.terminee)),
+  (ref) =>
+      _parEcheance(ref.watch(listeTachesProvider).where((t) => !t.terminee)),
 );
 
 final tachesEnRetardProvider = Provider<List<Task>>(
-  (ref) => _parEcheance(ref.watch(tachesProvider).where((t) => t.enRetard())),
+  (ref) =>
+      _parEcheance(ref.watch(listeTachesProvider).where((t) => t.enRetard())),
 );
 
 final tachesFaitesProvider = Provider<List<Task>>(
   (ref) => _parEcheance(
-    ref.watch(tachesProvider).where((t) => t.terminee),
+    ref.watch(listeTachesProvider).where((t) => t.terminee),
   ).reversed.toList(),
 );
 
