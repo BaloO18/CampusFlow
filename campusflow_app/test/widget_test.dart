@@ -1,6 +1,7 @@
 import 'package:campusflow/app.dart';
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Future<void> seConnecter(
@@ -11,7 +12,11 @@ Future<void> seConnecter(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
-    CampusFlowApp(repository: FakeCampusRepository(latence: Duration.zero)),
+    ProviderScope(
+      child: CampusFlowApp(
+        repository: FakeCampusRepository(latence: Duration.zero),
+      ),
+    ),
   );
   await tester.enterText(find.byType(TextFormField).at(1), 'secret');
   await tester.tap(find.text('Se connecter'));

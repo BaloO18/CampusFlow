@@ -119,8 +119,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     final coursId = _coursId;
     if (!(_form.currentState?.validate() ?? false)) return;
     if (coursId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Choisissez un cours')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Choisissez un cours')));
       return;
     }
     setState(() => _envoi = true);

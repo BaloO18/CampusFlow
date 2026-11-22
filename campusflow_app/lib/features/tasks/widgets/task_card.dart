@@ -172,8 +172,10 @@ class _Meta extends StatelessWidget {
         const SizedBox(width: 3),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: c, fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: c,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -195,8 +197,10 @@ class _Badge extends StatelessWidget {
     ),
     child: Text(
       label,
-      style: Theme.of(context).textTheme.labelSmall
-          ?.copyWith(color: color, fontWeight: FontWeight.w700),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        color: color,
+        fontWeight: FontWeight.w700,
+      ),
     ),
   );
 }

@@ -300,8 +300,10 @@ class _Pastille extends StatelessWidget {
         const SizedBox(width: AppTokens.s1 + 2),
         Text(
           label,
-          style: Theme.of(context).textTheme.labelLarge
-              ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     ),
