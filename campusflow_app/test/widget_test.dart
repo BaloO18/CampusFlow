@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:campusflow/features/auth/auth_notifier.dart';
 import 'package:campusflow/features/home/home_shell.dart';
 
 Future<void> seConnecter(
@@ -15,9 +16,12 @@ Future<void> seConnecter(
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      child: CampusFlowApp(
-        repository: FakeCampusRepository(latence: Duration.zero),
-      ),
+      overrides: [
+        campusRepositoryProvider.overrideWithValue(
+          FakeCampusRepository(latence: Duration.zero),
+        ),
+      ],
+      child: const CampusFlowApp(),
     ),
   );
   await tester.enterText(find.byType(TextFormField).at(1), 'secret');
@@ -59,6 +63,23 @@ void main() {
     await tester.tap(find.text('Enregistrer'));
     await tester.pumpAndSettle();
     expect(find.text('Le titre est obligatoire'), findsOneWidget);
+  });
+
+  testWidgets('une tâche cochée dans le détail change aussi la liste', (
+    tester,
+  ) async {
+    await seConnecter(tester);
+    await tester.tap(find.text('Rendu TP Dart'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Marquer comme fait'));
+    await tester.pumpAndSettle();
+    GoRouter.of(tester.element(find.text('Marquer comme à faire'))).pop();
+    await tester.pumpAndSettle();
+    expect(find.text('Rendu TP Dart'), findsNothing);
+    await tester.ensureVisible(find.text('Terminées'));
+    await tester.tap(find.text('Terminées'));
+    await tester.pumpAndSettle();
+    expect(find.text('Rendu TP Dart'), findsOneWidget);
   });
 
   testWidgets('détail puis marquer comme fait', (tester) async {

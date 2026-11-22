@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/auth_notifier.dart';
 import '../features/auth/login_screen.dart';
 import '../features/courses/course_tasks_screen.dart';
 import '../features/courses/courses_screen.dart';
@@ -9,7 +11,6 @@ import '../features/profile/profile_screen.dart';
 import '../features/tasks/task_detail_screen.dart';
 import '../features/tasks/task_form_screen.dart';
 import '../features/tasks/tasks_screen.dart';
-import 'state/campus_state.dart';
 
 abstract final class Routes {
   static const login = '/login';
@@ -23,11 +24,11 @@ abstract final class Routes {
   static String coursDetail(String id) => '/cours/$id';
 }
 
-GoRouter creerRouter(CampusState etat) {
+final routerProvider = Provider<GoRouter>((ref) {
   final racine = GlobalKey<NavigatorState>();
-  final connexion = ValueNotifier(etat.utilisateur != null);
-  etat.addListener(() => connexion.value = etat.utilisateur != null);
-  return GoRouter(
+  final connexion = ValueNotifier(ref.read(authProvider) != null);
+  ref.listen(authProvider, (_, user) => connexion.value = user != null);
+  final router = GoRouter(
     navigatorKey: racine,
     initialLocation: Routes.taches,
     refreshListenable: connexion,
@@ -69,11 +70,7 @@ GoRouter creerRouter(CampusState etat) {
                     parentNavigatorKey: racine,
                     pageBuilder: (context, state) => MaterialPage(
                       fullscreenDialog: true,
-                      child: TaskFormScreen(
-                        task: CampusScope.of(
-                          context,
-                        ).tache(state.pathParameters['id']!),
-                      ),
+                      child: TaskFormScreen(taskId: state.pathParameters['id']),
                     ),
                   ),
                 ],
@@ -100,4 +97,9 @@ GoRouter creerRouter(CampusState etat) {
       ),
     ],
   );
-}
+  ref.onDispose(() {
+    router.dispose();
+    connexion.dispose();
+  });
+  return router;
+});

@@ -1,66 +1,63 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/router.dart';
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
-import '../../shared/widgets/async_content.dart';
 import '../../shared/widgets/course_avatar.dart';
 import '../../shared/widgets/section_header.dart';
+import '../tasks/taches_notifier.dart';
 
-class CoursesScreen extends StatelessWidget {
+class CoursesScreen extends ConsumerWidget {
   const CoursesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cours = ref.watch(coursProvider);
     final echelle = MediaQuery.textScalerOf(context).scale(16) / 16;
     return Scaffold(
-      body: AsyncContent(
-        child: CustomScrollView(
-          slivers: [
-            SliverSafeArea(
-              bottom: false,
-              sliver: SliverToBoxAdapter(
-                child: PageTitle(
-                  title: 'Mes cours',
-                  subtitle: '${state.cours.length} cours ce semestre',
-                ),
+      body: CustomScrollView(
+        slivers: [
+          SliverSafeArea(
+            bottom: false,
+            sliver: SliverToBoxAdapter(
+              child: PageTitle(
+                title: 'Mes cours',
+                subtitle: '${cours.length} cours ce semestre',
               ),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.all(AppTokens.s4),
-              sliver: SliverGrid.builder(
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 220,
-                  mainAxisExtent: 170 * echelle.clamp(1.0, 2.2),
-                  crossAxisSpacing: AppTokens.s3,
-                  mainAxisSpacing: AppTokens.s3,
-                ),
-                itemCount: state.cours.length,
-                itemBuilder: (context, i) => _CarteCours(cours: state.cours[i]),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(AppTokens.s4),
+            sliver: SliverGrid.builder(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 220,
+                mainAxisExtent: 170 * echelle.clamp(1.0, 2.2),
+                crossAxisSpacing: AppTokens.s3,
+                mainAxisSpacing: AppTokens.s3,
               ),
+              itemCount: cours.length,
+              itemBuilder: (context, i) => _CarteCours(cours: cours[i]),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _CarteCours extends StatelessWidget {
+class _CarteCours extends ConsumerWidget {
   const _CarteCours({required this.cours});
 
   final Course cours;
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     final couleur = Color(cours.couleur);
-    final taches = state.tachesDuCours(cours.id);
+    final taches = ref.watch(tachesDuCoursProvider(cours.id));
     final aFaire = taches.where((t) => !t.terminee).length;
     final faites = taches.length - aFaire;
 

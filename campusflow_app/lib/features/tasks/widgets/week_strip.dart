@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/state/campus_state.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/dates.dart';
+import '../taches_notifier.dart';
 
-class WeekStrip extends StatelessWidget {
+class WeekStrip extends ConsumerWidget {
   const WeekStrip({
     super.key,
     required this.selected,
@@ -15,8 +16,8 @@ class WeekStrip extends StatelessWidget {
   final ValueChanged<DateTime?> onSelected;
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final taches = ref.watch(tachesProvider);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final aujourdhui = Dates.jour(DateTime.now());
@@ -31,7 +32,7 @@ class WeekStrip extends StatelessWidget {
             Builder(
               builder: (context) {
                 final jour = aujourdhui.add(Duration(days: i));
-                final nombre = state.taches
+                final nombre = taches
                     .where(
                       (t) => !t.terminee && Dates.memeJour(t.echeance, jour),
                     )

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
+import 'auth_notifier.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _form = GlobalKey<FormState>();
   final _email = TextEditingController(text: 'amina@campus.bf');
   final _motDePasse = TextEditingController();
@@ -33,7 +34,9 @@ class _LoginScreenState extends State<LoginScreen> {
       _erreur = null;
     });
     try {
-      await CampusScope.of(context).connexion(_email.text, _motDePasse.text);
+      await ref
+          .read(authProvider.notifier)
+          .connexion(_email.text, _motDePasse.text);
     } catch (e) {
       if (mounted) setState(() => _erreur = '$e');
     } finally {

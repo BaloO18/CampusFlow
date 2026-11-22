@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/state/campus_state.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/dates.dart';
+import '../taches_notifier.dart';
 
-class SummaryCard extends StatelessWidget {
+class SummaryCard extends ConsumerWidget {
   const SummaryCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final taches = ref.watch(tachesProvider);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final semaine =
-        state.taches
+        taches
             .where((t) => !t.terminee && Dates.cetteSemaine(t.echeance))
             .toList()
           ..sort((a, b) => a.echeance.compareTo(b.echeance));
-    final total = state.taches.length;
-    final faites = state.taches.where((t) => t.terminee).length;
+    final total = taches.length;
+    final faites = taches.where((t) => t.terminee).length;
     final prochaine = semaine.where((t) => !t.enRetard()).firstOrNull;
     const blanc = Colors.white;
 

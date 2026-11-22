@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/router.dart';
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
-import '../../shared/widgets/async_content.dart';
+import '../../shared/widgets/empty_state.dart';
+import '../tasks/taches_notifier.dart';
 import '../tasks/task_form_screen.dart';
 import '../tasks/widgets/task_card.dart';
 
-class CourseTasksScreen extends StatelessWidget {
+class CourseTasksScreen extends ConsumerWidget {
   const CourseTasksScreen({super.key, required this.coursId});
 
   final String coursId;
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    final cours = state.coursDe(coursId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cours = ref.watch(coursParIdProvider(coursId));
     if (cours == null) return Scaffold(appBar: AppBar());
-    final taches = state.tachesDuCours(cours.id);
+    final taches = ref.watch(tachesDuCoursProvider(cours.id));
     final aFaire = taches.where((t) => !t.terminee).length;
     final couleur = Color(cours.couleur);
     final text = Theme.of(context).textTheme;

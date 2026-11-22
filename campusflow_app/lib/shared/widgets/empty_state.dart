@@ -1,37 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
-
-class AsyncContent extends StatelessWidget {
-  const AsyncContent({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    final erreur = state.erreur;
-    if (state.chargement && state.taches.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(semanticsLabel: 'Chargement'),
-      );
-    }
-    if (erreur != null && state.taches.isEmpty) {
-      return EmptyState(
-        icon: Icons.cloud_off_rounded,
-        title: 'Impossible de charger les échéances',
-        message: '$erreur',
-        action: FilledButton.icon(
-          onPressed: state.charger,
-          icon: const Icon(Icons.refresh_rounded),
-          label: const Text('Réessayer'),
-        ),
-      );
-    }
-    return child;
-  }
-}
 
 class EmptyState extends StatelessWidget {
   const EmptyState({

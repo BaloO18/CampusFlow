@@ -1,23 +1,25 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/state/campus_state.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/dates.dart';
+import '../../auth/auth_notifier.dart';
+import '../taches_notifier.dart';
 
-class ReminderBanner extends StatelessWidget {
+class ReminderBanner extends ConsumerWidget {
   const ReminderBanner({super.key, required this.onTap});
 
   final ValueChanged<Task> onTap;
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    if (!(state.utilisateur?.rappelsActives ?? false)) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final taches = ref.watch(tachesProvider);
+    if (!(ref.watch(authProvider)?.rappelsActives ?? false)) {
       return const SizedBox.shrink();
     }
     final maintenant = DateTime.now();
-    final rappels = state.taches.where((t) {
+    final rappels = taches.where((t) {
       final quand = t.dateRappel;
       return !t.terminee &&
           quand != null &&

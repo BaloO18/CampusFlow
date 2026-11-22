@@ -1,12 +1,14 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/router.dart';
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../core/utils/dates.dart';
 import '../../shared/widgets/section_header.dart';
+import '../auth/auth_notifier.dart';
+import 'taches_notifier.dart';
 
 Future<String?> ouvrirFormulaire(
   BuildContext context, {
@@ -21,17 +23,17 @@ Future<String?> ouvrirFormulaire(
         ).toString(),
 );
 
-class TaskFormScreen extends StatefulWidget {
-  const TaskFormScreen({super.key, this.task, this.coursId});
+class TaskFormScreen extends ConsumerStatefulWidget {
+  const TaskFormScreen({super.key, this.taskId, this.coursId});
 
-  final Task? task;
+  final String? taskId;
   final String? coursId;
 
   @override
-  State<TaskFormScreen> createState() => _TaskFormScreenState();
+  ConsumerState<TaskFormScreen> createState() => _TaskFormScreenState();
 }
 
-class _TaskFormScreenState extends State<TaskFormScreen> {
+class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
   static const _rappels = <Duration?>[
     null,
     Duration(hours: 1),
@@ -41,35 +43,34 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   ];
 
   final _form = GlobalKey<FormState>();
-  late final _titre = TextEditingController(text: widget.task?.titre);
-  late final _description = TextEditingController(
-    text: widget.task?.description,
-  );
+  late final Task? _task = switch (widget.taskId) {
+    final id? => ref.read(tacheProvider(id)),
+    null => null,
+  };
+  late final _titre = TextEditingController(text: _task?.titre);
+  late final _description = TextEditingController(text: _task?.description);
   String? _coursId;
   late DateTime _echeance;
   Duration? _rappel;
-  bool _initialise = false;
   bool _envoi = false;
 
-  bool get _edition => widget.task != null;
+  bool get _edition => _task != null;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_initialise) return;
-    _initialise = true;
-    final state = CampusScope.of(context);
-    final task = widget.task;
+  void initState() {
+    super.initState();
+    final cours = ref.read(coursProvider);
+    final task = _task;
     final demain = DateTime.now().add(const Duration(days: 1));
     _coursId =
         task?.coursId ??
         widget.coursId ??
-        (state.cours.isEmpty ? null : state.cours.first.id);
+        (cours.isEmpty ? null : cours.first.id);
     _echeance =
         task?.echeance ?? DateTime(demain.year, demain.month, demain.day, 17);
     _rappel = task != null
         ? task.rappel
-        : (state.utilisateur?.rappelsActives ?? true)
+        : (ref.read(authProvider)?.rappelsActives ?? true)
         ? const Duration(days: 1)
         : null;
   }
@@ -131,8 +132,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     setState(() => _envoi = true);
     final description = _description.text.trim();
     final base =
-        widget.task ??
-        Task(id: '', titre: '', coursId: coursId, echeance: _echeance);
+        _task ?? Task(id: '', titre: '', coursId: coursId, echeance: _echeance);
     final task = base.copyWith(
       titre: _titre.text.trim(),
       coursId: coursId,
@@ -144,7 +144,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     );
     final messenger = ScaffoldMessenger.of(context);
     try {
-      final sauvee = await CampusScope.of(context).enregistrer(task);
+      final taches = ref.read(tachesProvider.notifier);
+      final sauvee = _edition ? task : taches.ajouter(task);
+      if (_edition) taches.modifier(task);
       if (!mounted) return;
       Navigator.of(context).pop(sauvee.id);
       messenger
@@ -165,7 +167,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cours = CampusScope.of(context).cours;
+    final cours = ref.watch(coursProvider);
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
 

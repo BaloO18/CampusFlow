@@ -1,14 +1,16 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/layout/disposition.dart';
 import '../../core/router.dart';
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../core/utils/dates.dart';
-import '../../shared/widgets/async_content.dart';
+import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/section_header.dart';
+import '../auth/auth_notifier.dart';
+import 'taches_notifier.dart';
 import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
 import 'widgets/reminder_banner.dart';
@@ -25,14 +27,14 @@ enum Filtre {
   final String label;
 }
 
-class TasksScreen extends StatefulWidget {
+class TasksScreen extends ConsumerStatefulWidget {
   const TasksScreen({super.key});
 
   @override
-  State<TasksScreen> createState() => _TasksScreenState();
+  ConsumerState<TasksScreen> createState() => _TasksScreenState();
 }
 
-class _TasksScreenState extends State<TasksScreen> {
+class _TasksScreenState extends ConsumerState<TasksScreen> {
   Filtre _filtre = Filtre.semaine;
   DateTime? _jour;
   String? _selection;
@@ -80,8 +82,8 @@ class _TasksScreenState extends State<TasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    final groupes = _grouper(_filtrer(state.taches));
+    final taches = ref.watch(tachesProvider);
+    final groupes = _grouper(_filtrer(taches));
     final selection = _selection;
 
     final lignes = <WidgetBuilder>[
@@ -172,27 +174,16 @@ class _TasksScreenState extends State<TasksScreen> {
       ],
     ];
 
-    final liste = AsyncContent(
-      child: RefreshIndicator(
-        onRefresh: state.charger,
-        child: ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 112),
-          itemCount: lignes.length,
-          itemBuilder: (context, i) => lignes[i](context),
-        ),
-      ),
+    final liste = ListView.builder(
+      padding: const EdgeInsets.only(bottom: 112),
+      itemCount: lignes.length,
+      itemBuilder: (context, i) => lignes[i](context),
     );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Échéances'),
         actions: [
-          IconButton(
-            tooltip: 'Actualiser',
-            onPressed: state.chargement ? null : state.charger,
-            icon: const Icon(Icons.refresh_rounded),
-          ),
           _BoutonProfil(onTap: () => context.go(Routes.profil)),
           const SizedBox(width: AppTokens.s2),
         ],
@@ -213,7 +204,9 @@ class _TasksScreenState extends State<TasksScreen> {
                 SizedBox(width: 440, child: liste),
                 const VerticalDivider(width: 1),
                 Expanded(
-                  child: selection != null && state.tache(selection) != null
+                  child:
+                      selection != null &&
+                          ref.watch(tacheProvider(selection)) != null
                       ? TaskDetailView(
                           key: ValueKey(selection),
                           taskId: selection,
@@ -232,12 +225,12 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 }
 
-class _Salutation extends StatelessWidget {
+class _Salutation extends ConsumerWidget {
   const _Salutation();
 
   @override
-  Widget build(BuildContext context) {
-    final nom = CampusScope.of(context).utilisateur?.nom ?? '';
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nom = ref.watch(authProvider)?.nom ?? '';
     return PageTitle(
       subtitle: Dates.jourComplet(DateTime.now()),
       title: 'Bonjour $nom 👋',
@@ -245,15 +238,15 @@ class _Salutation extends StatelessWidget {
   }
 }
 
-class _BoutonProfil extends StatelessWidget {
+class _BoutonProfil extends ConsumerWidget {
   const _BoutonProfil({this.onTap});
 
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    final nom = CampusScope.of(context).utilisateur?.nom ?? '';
+    final nom = ref.watch(authProvider)?.nom ?? '';
     return Semantics(
       button: true,
       label: 'Ouvrir le profil',

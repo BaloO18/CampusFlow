@@ -1,20 +1,21 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
 import '../../core/utils/dates.dart';
+import 'taches_notifier.dart';
 import 'task_form_screen.dart';
 import 'widgets/task_card.dart';
 
-class TaskDetailScreen extends StatelessWidget {
+class TaskDetailScreen extends ConsumerWidget {
   const TaskDetailScreen({super.key, required this.taskId});
 
   final String taskId;
 
   @override
-  Widget build(BuildContext context) {
-    final existe = CampusScope.of(context).tache(taskId) != null;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final existe = ref.watch(tacheProvider(taskId)) != null;
     return Scaffold(
       appBar: existe ? null : AppBar(),
       body: existe
@@ -27,7 +28,7 @@ class TaskDetailScreen extends StatelessWidget {
   }
 }
 
-class TaskDetailView extends StatelessWidget {
+class TaskDetailView extends ConsumerWidget {
   const TaskDetailView({
     super.key,
     required this.taskId,
@@ -39,8 +40,7 @@ class TaskDetailView extends StatelessWidget {
   final bool embedded;
   final VoidCallback? onDeleted;
 
-  Future<void> _supprimer(BuildContext context) async {
-    final state = CampusScope.of(context);
+  Future<void> _supprimer(BuildContext context, WidgetRef ref) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
@@ -60,12 +60,12 @@ class TaskDetailView extends StatelessWidget {
       ),
     );
     if (ok ?? false) {
-      await state.supprimer(taskId);
+      ref.read(tachesProvider.notifier).supprimer(taskId);
       onDeleted?.call();
     }
   }
 
-  List<Widget> _actions(BuildContext context, Task task) => [
+  List<Widget> _actions(BuildContext context, WidgetRef ref, Task task) => [
     IconButton(
       tooltip: 'Modifier',
       icon: const Icon(Icons.edit_rounded),
@@ -74,18 +74,17 @@ class TaskDetailView extends StatelessWidget {
     IconButton(
       tooltip: 'Supprimer',
       icon: const Icon(Icons.delete_outline_rounded),
-      onPressed: () => _supprimer(context),
+      onPressed: () => _supprimer(context, ref),
     ),
   ];
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    final task = state.tache(taskId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final task = ref.watch(tacheProvider(taskId));
     if (task == null) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final cours = state.coursDe(task.coursId);
+    final cours = ref.watch(coursParIdProvider(task.coursId));
     final couleur = Color(cours?.couleur ?? AppTokens.seed.toARGB32());
     final retard = task.enRetard();
     const blanc = Colors.white;
@@ -136,7 +135,7 @@ class TaskDetailView extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(child: statut),
-                        ..._actions(context, task),
+                        ..._actions(context, ref, task),
                       ],
                     ),
                     const SizedBox(height: AppTokens.s3),
@@ -158,7 +157,7 @@ class TaskDetailView extends StatelessWidget {
             backgroundColor: couleur.darken(0.2),
             foregroundColor: blanc,
             iconTheme: const IconThemeData(color: blanc),
-            actions: _actions(context, task),
+            actions: _actions(context, ref, task),
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsetsDirectional.only(
                 start: 56,
@@ -260,12 +259,12 @@ class TaskDetailView extends StatelessWidget {
               padding: const EdgeInsets.all(AppTokens.s4),
               child: task.terminee
                   ? OutlinedButton.icon(
-                      onPressed: () => basculerTache(context, task),
+                      onPressed: () => basculerTache(context, ref, task),
                       icon: const Icon(Icons.undo_rounded),
                       label: const Text('Marquer comme à faire'),
                     )
                   : FilledButton.icon(
-                      onPressed: () => basculerTache(context, task),
+                      onPressed: () => basculerTache(context, ref, task),
                       icon: const Icon(Icons.check_rounded),
                       label: const Text('Marquer comme fait'),
                     ),

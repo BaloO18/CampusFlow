@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/state/campus_state.dart';
 import '../../core/theme/app_tokens.dart';
+import '../../core/theme/mode_theme.dart';
 import '../../shared/widgets/section_header.dart';
+import '../auth/auth_notifier.dart';
+import '../tasks/taches_notifier.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   static const _themes = [
@@ -13,8 +16,8 @@ class ProfileScreen extends StatelessWidget {
     (ThemeMode.dark, 'Sombre', Icons.dark_mode_rounded),
   ];
 
-  void _choisirTheme(BuildContext context) {
-    final state = CampusScope.of(context);
+  void _choisirTheme(BuildContext context, WidgetRef ref) {
+    final actuel = ref.read(modeThemeProvider);
     showModalBottomSheet<void>(
       context: context,
       builder: (c) => SafeArea(
@@ -32,12 +35,12 @@ class ProfileScreen extends StatelessWidget {
               ListTile(
                 leading: Icon(icon),
                 title: Text(label),
-                trailing: state.modeTheme == mode
+                trailing: actuel == mode
                     ? const Icon(Icons.check_rounded)
                     : null,
-                selected: state.modeTheme == mode,
+                selected: actuel == mode,
                 onTap: () {
-                  state.changerTheme(mode);
+                  ref.read(modeThemeProvider.notifier).choisir(mode);
                   Navigator.pop(c);
                 },
               ),
@@ -49,16 +52,18 @@ class ProfileScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
-    final user = state.utilisateur;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider);
+    final taches = ref.watch(tachesProvider);
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final nom = user?.nom ?? '';
-    final aFaire = state.taches.where((t) => !t.terminee).length;
-    final retard = state.taches.where((t) => t.enRetard()).length;
-    final faites = state.taches.where((t) => t.terminee).length;
-    final theme = _themes.firstWhere((t) => t.$1 == state.modeTheme).$2;
+    final aFaire = taches.where((t) => !t.terminee).length;
+    final retard = taches.where((t) => t.enRetard()).length;
+    final faites = taches.where((t) => t.terminee).length;
+    final theme = _themes
+        .firstWhere((t) => t.$1 == ref.watch(modeThemeProvider))
+        .$2;
     const blanc = Colors.white;
 
     return Scaffold(
@@ -168,7 +173,9 @@ class ProfileScreen extends StatelessWidget {
                         title: const Text('Rappels'),
                         subtitle: const Text('Avant chaque échéance'),
                         value: user?.rappelsActives ?? false,
-                        onChanged: state.activerRappels,
+                        onChanged: ref
+                            .read(authProvider.notifier)
+                            .activerRappels,
                       ),
                       const Divider(indent: 72),
                       ListTile(
@@ -176,7 +183,7 @@ class ProfileScreen extends StatelessWidget {
                         title: const Text('Thème'),
                         subtitle: Text(theme),
                         trailing: const Icon(Icons.chevron_right_rounded),
-                        onTap: () => _choisirTheme(context),
+                        onTap: () => _choisirTheme(context, ref),
                       ),
                     ],
                   ),
@@ -204,7 +211,7 @@ class ProfileScreen extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        onTap: state.deconnexion,
+                        onTap: ref.read(authProvider.notifier).deconnexion,
                       ),
                     ],
                   ),

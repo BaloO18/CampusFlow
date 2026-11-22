@@ -1,15 +1,20 @@
 import 'package:campusflow_models/campusflow_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/state/campus_state.dart';
 import '../../../core/theme/app_tokens.dart';
 import '../../../core/utils/dates.dart';
 import '../../../shared/widgets/course_avatar.dart';
+import '../taches_notifier.dart';
 
-Future<void> basculerTache(BuildContext context, Task task) async {
-  final state = CampusScope.of(context);
+Future<void> basculerTache(
+  BuildContext context,
+  WidgetRef ref,
+  Task task,
+) async {
+  final taches = ref.read(tachesProvider.notifier);
   final messenger = ScaffoldMessenger.of(context);
-  await state.basculer(task);
+  taches.basculer(task.id);
   messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(
@@ -17,16 +22,13 @@ Future<void> basculerTache(BuildContext context, Task task) async {
         content: Text(task.terminee ? 'Tâche rouverte' : 'Tâche terminée 🎉'),
         action: SnackBarAction(
           label: 'Annuler',
-          onPressed: () {
-            final actuelle = state.tache(task.id);
-            if (actuelle != null) state.basculer(actuelle);
-          },
+          onPressed: () => taches.basculer(task.id),
         ),
       ),
     );
 }
 
-class TaskCard extends StatelessWidget {
+class TaskCard extends ConsumerWidget {
   const TaskCard({
     super.key,
     required this.task,
@@ -39,11 +41,10 @@ class TaskCard extends StatelessWidget {
   final bool selected;
 
   @override
-  Widget build(BuildContext context) {
-    final state = CampusScope.of(context);
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final cours = state.coursDe(task.coursId);
+    final cours = ref.watch(coursParIdProvider(task.coursId));
     final retard = task.enRetard();
     final quand =
         '${Dates.relatif(task.echeance)} · ${Dates.heure(task.echeance)}';
@@ -52,7 +53,7 @@ class TaskCard extends StatelessWidget {
       key: ValueKey('swipe-${task.id}'),
       direction: DismissDirection.startToEnd,
       confirmDismiss: (_) async {
-        await basculerTache(context, task);
+        await basculerTache(context, ref, task);
         return false;
       },
       background: Container(
@@ -140,7 +141,7 @@ class TaskCard extends StatelessWidget {
             tooltip: task.terminee
                 ? 'Marquer comme à faire'
                 : 'Marquer comme fait',
-            onPressed: () => basculerTache(context, task),
+            onPressed: () => basculerTache(context, ref, task),
             icon: Icon(
               task.terminee
                   ? Icons.check_circle_rounded
