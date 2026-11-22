@@ -242,7 +242,7 @@ class _Salutation extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final nom = ref.watch(authProvider)?.nom ?? '';
+    final nom = ref.watch(utilisateurProvider)?.nom ?? '';
     return PageTitle(
       subtitle: Dates.jourComplet(DateTime.now()),
       title: 'Bonjour $nom 👋',
@@ -258,7 +258,7 @@ class _BoutonProfil extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    final nom = ref.watch(authProvider)?.nom ?? '';
+    final nom = ref.watch(utilisateurProvider)?.nom ?? '';
     return Semantics(
       button: true,
       label: 'Ouvrir le profil',

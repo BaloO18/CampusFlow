@@ -5,7 +5,7 @@ import '../../auth/application/auth_notifier.dart';
 import '../data/cours_repositories.dart';
 
 final coursAsyncProvider = FutureProvider<List<Course>>((ref) async {
-  if (ref.watch(authProvider) == null) return const [];
+  if (ref.watch(utilisateurIdProvider) == null) return const [];
   return ref.watch(coursRepositoryProvider).lister();
 });
 

@@ -13,6 +13,7 @@ import '../features/taches/presentation/task_form_screen.dart';
 import '../features/taches/presentation/tasks_screen.dart';
 
 abstract final class Routes {
+  static const demarrage = '/';
   static const login = '/login';
   static const taches = '/taches';
   static const nouvelle = '/taches/nouvelle';
@@ -24,22 +25,42 @@ abstract final class Routes {
   static String coursDetail(String id) => '/cours/$id';
 }
 
+enum EtatSession { chargement, connecte, deconnecte }
+
+EtatSession _etat(AsyncValue<Object?> auth) {
+  if (auth.isLoading && !auth.hasValue) return EtatSession.chargement;
+  return auth.value != null ? EtatSession.connecte : EtatSession.deconnecte;
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   final racine = GlobalKey<NavigatorState>();
-  final connexion = ValueNotifier(ref.read(authProvider) != null);
-  ref.listen(authProvider, (_, user) => connexion.value = user != null);
+  final session = ValueNotifier(_etat(ref.read(authProvider)));
+  ref.listen(authProvider, (_, auth) => session.value = _etat(auth));
   final router = GoRouter(
     navigatorKey: racine,
     initialLocation: Routes.taches,
-    refreshListenable: connexion,
+    refreshListenable: session,
     redirect: (context, state) {
-      final connecte = connexion.value;
-      final surLogin = state.matchedLocation == Routes.login;
-      if (!connecte) return surLogin ? null : Routes.login;
-      if (surLogin) return Routes.taches;
-      return null;
+      final lieu = state.matchedLocation;
+      return switch (session.value) {
+        EtatSession.chargement =>
+          lieu == Routes.demarrage ? null : Routes.demarrage,
+        EtatSession.deconnecte => lieu == Routes.login ? null : Routes.login,
+        EtatSession.connecte =>
+          lieu == Routes.login || lieu == Routes.demarrage
+              ? Routes.taches
+              : null,
+      };
     },
     routes: [
+      GoRoute(
+        path: Routes.demarrage,
+        builder: (_, _) => const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(semanticsLabel: 'Chargement'),
+          ),
+        ),
+      ),
       GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
       ShellRoute(
         builder: (_, state, child) =>
@@ -99,7 +120,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
   ref.onDispose(() {
     router.dispose();
-    connexion.dispose();
+    session.dispose();
   });
   return router;
 });

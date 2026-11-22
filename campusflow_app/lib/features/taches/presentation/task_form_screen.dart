@@ -71,7 +71,7 @@ class _TaskFormScreenState extends ConsumerState<TaskFormScreen> {
         task?.echeance ?? DateTime(demain.year, demain.month, demain.day, 17);
     _rappel = task != null
         ? task.rappel
-        : (ref.read(authProvider)?.rappelsActives ?? true)
+        : (ref.read(utilisateurProvider)?.rappelsActives ?? true)
         ? const Duration(days: 1)
         : null;
   }

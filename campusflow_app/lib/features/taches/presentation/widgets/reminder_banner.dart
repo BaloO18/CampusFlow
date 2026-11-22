@@ -15,7 +15,7 @@ class ReminderBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final taches = ref.watch(listeTachesProvider);
-    if (!(ref.watch(authProvider)?.rappelsActives ?? false)) {
+    if (!(ref.watch(utilisateurProvider)?.rappelsActives ?? false)) {
       return const SizedBox.shrink();
     }
     final maintenant = DateTime.now();

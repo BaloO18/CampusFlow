@@ -8,7 +8,7 @@ import '../domain/task_repository.dart';
 class TachesNotifier extends AsyncNotifier<List<Task>> {
   @override
   Future<List<Task>> build() async {
-    if (ref.watch(authProvider) == null) return const [];
+    if (ref.watch(utilisateurIdProvider) == null) return const [];
     return ref.watch(taskRepositoryProvider).lister();
   }
 

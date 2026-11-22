@@ -1,4 +1,5 @@
 import 'package:campusflow/app.dart';
+import 'package:campusflow/features/auth/application/auth_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,7 @@ Future<void> seConnecter(
       child: const CampusFlowApp(),
     ),
   );
+  await tester.pumpAndSettle();
   await tester.enterText(find.byType(TextFormField).at(1), 'secret');
   await tester.tap(find.text('Se connecter'));
   await tester.pumpAndSettle();
@@ -111,6 +113,18 @@ void main() {
     await tester.tap(find.text('Réessayer'));
     await tester.pumpAndSettle();
     expect(find.text('Rendu TP Dart'), findsOneWidget);
+  });
+
+  testWidgets('un jeton expiré renvoie vers l’écran de connexion', (
+    tester,
+  ) async {
+    await seConnecter(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(HomeShell)),
+    );
+    await container.read(authProvider.notifier).expirer();
+    await tester.pumpAndSettle();
+    expect(find.text('Se connecter'), findsOneWidget);
   });
 
   testWidgets('la barre de navigation change d’adresse', (tester) async {

@@ -200,7 +200,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           const SizedBox(height: AppTokens.s4),
                           Text(
-                            'Démo : n’importe quel mot de passe de 4 caractères ou plus.',
+                            'Démo : amina@campus.bf, mot de passe 1234.',
                             textAlign: TextAlign.center,
                             style: text.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant,
